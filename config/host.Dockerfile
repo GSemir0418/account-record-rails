@@ -11,7 +11,7 @@ WORKDIR /mangosteen
 ADD mangosteen-*.tar.gz ./
 # 安装依赖（先配置 安装时排除开发和测试环境的依赖）
 RUN bundle config set --local without 'development test'
-RUN bundle install
+RUN bundle install --local
 # bundle exec rails server 是专门用在开发环境的
 # 生产环境用puma
 # 只在docker run时执行，build时不执行
