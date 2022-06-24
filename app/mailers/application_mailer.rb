@@ -1,4 +1,6 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: "from@example.com"
-  layout "mailer"
+  # 全局发送邮件地址
+  default from: "845217811@qq.com"
+  # html默认布局
+  layout 'mailer'
 end
