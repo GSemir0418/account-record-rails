@@ -1,5 +1,7 @@
 class ValidationCode < ApplicationRecord
     validates :email, presence: true
+    # 定义kind字段的枚举
+    enum kind: { sign_in: 0, reset_password: 1 }
 
     # 在创建这条记录之前，调用generate_code方法生成随机code
     before_create :generate_code
