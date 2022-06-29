@@ -12,8 +12,20 @@
 # the additional setup, and require it from the spec files that actually need
 # it.
 #
+require 'rspec_api_documentation'
+RspecApiDocumentation.configure do |config|
+  # 配置文档中请求体的格式为json
+  config.request_body_formatter = :json
+end
 # See https://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
+  config.before(:each) do |spec|
+    # 如果是acceptance类型的测试
+    if spec.metadata[:type].equal? :acceptance
+      header 'Accept', 'application/json'
+      header 'Content-Type', 'application/json'
+    end
+  end
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.
