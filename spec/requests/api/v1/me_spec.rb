@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "Me", type: :request do
   describe "获取当前登录用户" do
-    it "获取" do
+    it "登录后成功获取" do
       user = User.create email:'845217811@qq.com'
       # 先登录
       post '/api/v1/session', params: {
