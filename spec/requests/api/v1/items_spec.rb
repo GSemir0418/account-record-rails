@@ -26,9 +26,9 @@ RSpec.describe "Items", type: :request do
     end
     it "按时间筛选" do
       # 三条数据 两条符合
-      item1 = Item.create amount: 100, created_at: Time.new(2018, 1, 2)
-      item2 = Item.create amount: 100, created_at: Time.new(2018, 1, 2)
-      item3 = Item.create amount: 100, created_at: Time.new(2019, 1, 2)
+      item1 = Item.create amount: 100, created_at: '2018-01-02'
+      item2 = Item.create amount: 100, created_at: '2018-01-02'
+      item3 = Item.create amount: 100, created_at: '2019-01-01'
       # 按时间筛选
       get '/api/v1/items?created_after=2018-01-01&created_before=2018-01-03'
       expect(response).to have_http_status(200)
@@ -36,6 +36,37 @@ RSpec.describe "Items", type: :request do
       expect(json['resources'].size).to eq 2
       expect(json['resources'][0]['id']).to eq item1.id
       expect(json['resources'][1]['id']).to eq item2.id
+    end
+    it "按时间筛选(created_at===created_after)" do
+      # 指定时间为标准时区时间
+      # item1 = Item.create amount: 100, created_at: Time.new(2018, 1, 1, 0, 0, 0, 'Z')
+      # item1 = Item.create amount: 100, created_at: Time.new(2018, 1, 1, 0, 0, 0, '+00:00')
+      item1 = Item.create amount: 100, created_at: '2018-01-01'
+      get '/api/v1/items?created_after=2018-01-01&created_before=2018-01-03'
+      expect(response).to have_http_status(200)
+      json = JSON.parse response.body
+      expect(json['resources'].size).to eq 1
+      expect(json['resources'][0]['id']).to eq item1.id
+    end
+    it "按时间筛选(只传created_after)" do
+      # 指定时间为标准时区时间
+      item1 = Item.create amount: 100, created_at: '2018-01-01'
+      item2 = Item.create amount: 100, created_at: '2017-01-01'
+      get '/api/v1/items?created_after=2018-01-01'
+      expect(response).to have_http_status(200)
+      json = JSON.parse response.body
+      expect(json['resources'].size).to eq 1
+      expect(json['resources'][0]['id']).to eq item1.id
+    end
+    it "按时间筛选(只传created_before)" do
+      # 指定时间为标准时区时间
+      item1 = Item.create amount: 100, created_at: '2018-01-01'
+      item2 = Item.create amount: 100, created_at: '2019-01-01'
+      get '/api/v1/items?created_before=2018-01-03'
+      expect(response).to have_http_status(200)
+      json = JSON.parse response.body
+      expect(json['resources'].size).to eq 1
+      expect(json['resources'][0]['id']).to eq item1.id
     end
   end
 
