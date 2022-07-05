@@ -17,13 +17,7 @@ class Api::V1::SessionsController < ApplicationController
         if user.nil?
             render status: 404, json: {errors: '用户不存在'}
         else
-            # 加密私钥使用rails管理
-            # hmac_secret = 'b70db9f7-e84f-45fe-bd16-db83684d8c0e'
-            hmac_secret = Rails.application.credentials.hmac_secret
-            payload = { user_id: user.id }
-            # encode方法接受三个参数 分别是 payload数据，加密用私钥，加密算法
-            token = JWT.encode payload, hmac_secret, 'HS256'
-            render stauts: 200, json: { jwt: token }
+            render stauts: 200, json: { jwt: user.generate_jwt }
         end 
     end
 end
