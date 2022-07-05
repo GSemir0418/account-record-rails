@@ -3,6 +3,12 @@ require 'rails_helper'
 RSpec.describe "Items", type: :request do
   # 每次测试用例运行完毕，都会自动清空数据表
   describe "GET /items" do
+    it "分页，未登录" do
+      user1 = User.create email: '1@qq.com'
+      11.times { Item.create amount: 99, user_id: user1['id'] }
+      get '/api/v1/items'
+      expect(response).to have_http_status(401)
+    end
     it "能成功创建并分页返回数据" do
       # 构造用户
       user1 = User.create email: '1@qq.com'
@@ -22,12 +28,13 @@ RSpec.describe "Items", type: :request do
       expect(json['resources'].size).to eq 1
     end
     it "按时间筛选" do
+      user1 = User.create email: '1@qq.com'
       # 三条数据 两条符合
-      item1 = Item.create amount: 100, created_at: '2018-01-02'
-      item2 = Item.create amount: 100, created_at: '2018-01-02'
-      item3 = Item.create amount: 100, created_at: '2019-01-01'
+      item1 = Item.create amount: 100, created_at: '2018-01-02', user_id: user1.id
+      item2 = Item.create amount: 100, created_at: '2018-01-02', user_id: user1.id
+      item3 = Item.create amount: 100, created_at: '2019-01-01', user_id: user1.id
       # 按时间筛选
-      get '/api/v1/items?created_after=2018-01-01&created_before=2018-01-03'
+      get '/api/v1/items?created_after=2018-01-01&created_before=2018-01-03', headers: user1.generate_auth_header
       expect(response).to have_http_status(200)
       json = JSON.parse response.body
       expect(json['resources'].size).to eq 2
@@ -35,31 +42,34 @@ RSpec.describe "Items", type: :request do
       expect(json['resources'][1]['id']).to eq item2.id
     end
     it "按时间筛选(created_at===created_after)" do
+      user1 = User.create email: '1@qq.com'
       # 指定时间为标准时区时间
       # item1 = Item.create amount: 100, created_at: Time.new(2018, 1, 1, 0, 0, 0, 'Z')
       # item1 = Item.create amount: 100, created_at: Time.new(2018, 1, 1, 0, 0, 0, '+00:00')
-      item1 = Item.create amount: 100, created_at: '2018-01-01'
-      get '/api/v1/items?created_after=2018-01-01&created_before=2018-01-03'
+      item1 = Item.create amount: 100, created_at: '2018-01-01', user_id: user1.id
+      get '/api/v1/items?created_after=2018-01-01&created_before=2018-01-03', headers: user1.generate_auth_header
       expect(response).to have_http_status(200)
       json = JSON.parse response.body
       expect(json['resources'].size).to eq 1
       expect(json['resources'][0]['id']).to eq item1.id
     end
     it "按时间筛选(只传created_after)" do
+      user1 = User.create email: '1@qq.com'
       # 指定时间为标准时区时间
-      item1 = Item.create amount: 100, created_at: '2018-01-01'
-      item2 = Item.create amount: 100, created_at: '2017-01-01'
-      get '/api/v1/items?created_after=2018-01-01'
+      item1 = Item.create amount: 100, created_at: '2018-01-01', user_id: user1.id
+      item2 = Item.create amount: 100, created_at: '2017-01-01', user_id: user1.id
+      get '/api/v1/items?created_after=2018-01-01', headers: user1.generate_auth_header
       expect(response).to have_http_status(200)
       json = JSON.parse response.body
       expect(json['resources'].size).to eq 1
       expect(json['resources'][0]['id']).to eq item1.id
     end
     it "按时间筛选(只传created_before)" do
+      user1 = User.create email: '1@qq.com'
       # 指定时间为标准时区时间
-      item1 = Item.create amount: 100, created_at: '2018-01-01'
-      item2 = Item.create amount: 100, created_at: '2019-01-01'
-      get '/api/v1/items?created_before=2018-01-03'
+      item1 = Item.create amount: 100, created_at: '2018-01-01', user_id: user1.id
+      item2 = Item.create amount: 100, created_at: '2019-01-01', user_id: user1.id
+      get '/api/v1/items?created_before=2018-01-03', headers: user1.generate_auth_header
       expect(response).to have_http_status(200)
       json = JSON.parse response.body
       expect(json['resources'].size).to eq 1
