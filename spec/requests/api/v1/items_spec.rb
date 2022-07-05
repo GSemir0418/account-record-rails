@@ -4,22 +4,25 @@ RSpec.describe "Items", type: :request do
   # 每次测试用例运行完毕，都会自动清空数据表
   describe "GET /items" do
     it "能成功创建并分页返回数据" do
-      # 创建11条数据
-      11.times { Item.create amount: 99 }
-      # 此时期待数据库中有11条数据，表示创建成功
-      expect(Item.count).to eq 11
-
-      # 接下来构造请求
-      get '/api/v1/items'
-      # 期待状态码为200 即请求成功
-      expect(response).to have_http_status(200)
-      # 将返回数据反序列化
+      # 构造用户
+      user1 = User.create email: '1@qq.com'
+      user2 = User.create email: '2@qq.com'
+      # 为每个用户构造数据
+      11.times { Item.create amount: 99, user_id: user1['id'] }
+      11.times { Item.create amount: 99, user_id: user2['id'] }
+      expect(Item.count).to eq 22
+      # 用户登录，获取user1的jwt
+      post '/api/v1/session', params: {
+        email: user1.email, code:'123456'
+      }
       json = JSON.parse response.body
-      # 期待返回的数据条数为10(因为默认pageSize为10)，看是否成功返回
+      jwt = json['jwt']
+      # get获取user1的items时要带上权限请求头
+      get '/api/v1/items', headers: {"Authorization": "Bearer #{jwt}"}
+      expect(response).to have_http_status(200)
+      json = JSON.parse response.body
       expect(json['resources'].size).to eq 10
-
-      # 同理测试分页接口
-      get '/api/v1/items?page=2'
+      get '/api/v1/items?page=2', headers: {"Authorization": "Bearer #{jwt}"}
       expect(response).to have_http_status(200)
       json = JSON.parse response.body
       expect(json['resources'].size).to eq 1
