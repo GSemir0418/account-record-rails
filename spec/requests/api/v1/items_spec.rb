@@ -78,7 +78,7 @@ RSpec.describe "Items", type: :request do
   end
 
   describe 'POST /items' do
-    it '能够创建一条数据' do
+    xit '能够创建一条数据' do
       # 测试是否在数据表中创建了一条数据 利用change
       expect {
         post '/api/v1/items', params: {amount: 99}
