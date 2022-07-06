@@ -13,11 +13,14 @@ class Api::V1::SessionsController < ApplicationController
             return render status: 401 unless canSignin
             # unless 也可以写做 if not
         end
-        user = User.find_by_email params[:email]
-        if user.nil?
-            render status: 404, json: {errors: '用户不存在'}
-        else
-            render stauts: 200, json: { jwt: user.generate_jwt }
-        end 
+        # 首次登录自动创建用户
+        user = User.find_or_create_by email: params[:email]
+        render stauts: :ok, json: { jwt: user.generate_jwt }
+        # if user.nil?
+        #     render status: 404, json: {errors: '用户不存在'}
+        # else
+        #     render stauts: 200, json: { jwt: user.generate_jwt }
+        # end 
+
     end
 end
