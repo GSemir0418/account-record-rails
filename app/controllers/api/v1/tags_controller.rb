@@ -33,4 +33,16 @@ class Api::V1::TagsController < ApplicationController
             render json: {errors: tag.errors}, status: :unprocessable_entity
         end 
     end
+    def destroy 
+        tag = Tag.find params[:id]
+        # 没有删除别人的标签的权限
+        return head 403 unless tag.user_id == request.env['current_user_id']
+        # 软删除 更新deleted_at字段即可
+        tag.delete_at = Time.now
+        if tag.save
+            head 200
+        else
+            render json: {errors: tag.errors}, status: :unprocessable_entity
+        end
+    end
 end
