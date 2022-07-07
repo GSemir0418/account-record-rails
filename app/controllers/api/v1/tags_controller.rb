@@ -21,4 +21,16 @@ class Api::V1::TagsController < ApplicationController
             render json:{errors: tag.errors}, status: :unprocessable_entity
         end
     end
+    def update
+        tag = Tag.find params[:id]
+        # permit表示仅接收传入的字段的非空值
+        # update尝试更新数据库字段 如果出错会返回tag.errors
+        tag.update params.permit(:name, :sign)
+        # nil仅判空 empty还会判断size
+        if tag.errors.empty?
+            render json: {resource: tag}
+        else
+            render json: {errors: tag.errors}, status: :unprocessable_entity
+        end 
+    end
 end
