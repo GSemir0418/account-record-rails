@@ -9,6 +9,13 @@ class Api::V1::TagsController < ApplicationController
             count: Tag.count
             }}
     end
+    def show
+        current_user = User.find request.env['current_user_id']
+        return render status: 401 if current_user.nil?
+        tag = Tag.find params[:id]
+        return render status: 403 unless current_user.id == tag.user_id 
+        render json: {resource: tag}
+    end
     def create
         current_user = User.find request.env['current_user_id']
         return render status: 401 if current_user.nil?

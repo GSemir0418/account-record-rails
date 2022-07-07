@@ -21,6 +21,29 @@ RSpec.describe "Tags", type: :request do
       expect(json['resources'].size).to eq 1
     end
   end
+  describe "获取单个标签" do
+    it "未登录获取标签" do
+      user = User.create email: '1@qq.com'
+      tag = Tag.create name: 'x', sign: 'x', user_id: user.id
+      get "/api/v1/tags/#{tag.id}"
+      expect(response).to have_http_status 401
+    end
+    it "登录后获取单个标签" do
+      user = User.create email: '1@qq.com'
+      tag = Tag.create name: "x", sign: 'x', user_id: user.id
+      get "/api/v1/tags/#{tag.id}", headers: user.generate_auth_header
+      expect(response).to have_http_status 200
+      json = JSON.parse response.body
+      expect(json['resource']['id']).to eq tag.id 
+    end
+    it "不允许获取其他用户的标签" do
+      user = User.create email: '1@qq.com'
+      another_user = User.create email: '2@qq.com'
+      tag1 = Tag.create name: "x", sign: 'x', user_id: user.id
+      get "/api/v1/tags/#{tag1.id}", headers: another_user.generate_auth_header
+      expect(response).to have_http_status 403
+    end
+  end
   describe "创建标签" do 
     it "未登录创建标签" do
       post '/api/v1/tags', params: {
