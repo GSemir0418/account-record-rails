@@ -9,7 +9,7 @@ RSpec.describe "Items", type: :request do
       get '/api/v1/items'
       expect(response).to have_http_status(401)
     end
-    it "能成功创建并分页返回数据" do
+    it "登录后，分页获取数据" do
       # 构造用户
       user1 = User.create email: '1@qq.com'
       user2 = User.create email: '2@qq.com'
@@ -84,14 +84,29 @@ RSpec.describe "Items", type: :request do
     it '登录创建数据' do
       user = User.create email: '1@qq.com'
       expect {
-        post '/api/v1/items', params: {amount: 99}, 
-          headers: user.generate_auth_header
+        post '/api/v1/items', params: {
+          amount: 99, 
+          tags_id: [1, 2],
+          happen_at: '2018-10-01T00:00:00+00:00'
+        }, 
+        headers: user.generate_auth_header
       }.to change {Item.count}.by(+1)
       expect(response).to have_http_status(201)
       json = JSON.parse response.body
       expect(json['resource']['amount']).to eq(99)
       expect(json['resource']['user_id']).to eq(user.id)
       expect(json['resource']['id']).to be_an(Numeric)
+      expect(json['resource']['happen_at']).to eq "2018-10-01T00:00:00.000Z"
+    end
+    it '创建时amount、happen_at数据必填' do
+      user = User.create email: '1@qq.com'
+      post '/api/v1/items', params: {}, 
+        headers: user.generate_auth_header
+      expect(response).to have_http_status(422)
+      json = JSON.parse response.body
+      expect(json['errors']['amount'][0]).to eq "can't be blank"
+      expect(json['errors']['happen_at'][0]).to eq "can't be blank"
+      expect(json['errors']['tags_id'][0]).to eq "can't be blank"
     end
   end
 end
