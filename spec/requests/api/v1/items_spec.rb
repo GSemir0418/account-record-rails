@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "Items", type: :request do
   # 每次测试用例运行完毕，都会自动清空数据表
-  describe "GET /items" do
+  describe "获取账目" do
     it "分页，未登录" do
       user1 = User.create email: '1@qq.com'
       11.times { Item.create amount: 99, user_id: user1['id'] }
@@ -76,18 +76,21 @@ RSpec.describe "Items", type: :request do
       expect(json['resources'][0]['id']).to eq item1.id
     end
   end
-
-  describe 'POST /items' do
-    xit '能够创建一条数据' do
-      # 测试是否在数据表中创建了一条数据 利用change
+  describe '创建账目' do
+    it "未登录创建数据" do
+      post '/api/v1/items', params: {amount: 99}
+      expect(response).to have_http_status 401
+    end
+    it '登录创建数据' do
+      user = User.create email: '1@qq.com'
       expect {
-        post '/api/v1/items', params: {amount: 99}
+        post '/api/v1/items', params: {amount: 99}, 
+          headers: user.generate_auth_header
       }.to change {Item.count}.by(+1)
       expect(response).to have_http_status(201)
       json = JSON.parse response.body
-      # 测试返回数据的值是否一致
       expect(json['resource']['amount']).to eq(99)
-      # 是否有id（只能间接测试）
+      expect(json['resource']['user_id']).to eq(user.id)
       expect(json['resource']['id']).to be_an(Numeric)
     end
   end

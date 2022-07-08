@@ -16,7 +16,11 @@ class Api::V1::ItemsController < ApplicationController
     end
     
     def create
-        item = Item.new amount: params[:amount]
+        # item = Item.new amount: params[:amount], tags_id: params[:tags_id],
+            # happen_at: params['happen_at']
+        # 可简写为 
+        item = Item.new params.permit(:amount ,:tags_id, :happen_at)
+        item.user_id = request.env['current_user_id']
         if item.save
             render json: { resource: item }, status: 201
         else 
