@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>标签 API</title>
+    <title>账目 API</title>
     <meta charset="utf-8">
     <style>
       
@@ -106,11 +106,11 @@ table th, table td {
   </head>
   <body>
     <div class="container">
-      <h1>标签 API</h1>
+      <h1>账目 API</h1>
 
       <div class="article">
-        <h2>更新标签</h2>
-        <h3>PATCH /api/v1/tags/:id</h3>
+        <h2>创建账目</h2>
+        <h3>POST /api/v1/items</h3>
 
           <h3>Parameters</h3>
           <table class="parameters table table-striped table-bordered table-condensed">
@@ -122,19 +122,35 @@ table th, table td {
             </thead>
             <tbody>
               <tr>
-                <td>
-                    <span class="name">name</span>
+                <td class="required">
+                    <span class="name">amount</span>
                 </td>
                 <td>
-                  <span class="description">名称</span>
+                  <span class="description">金额（单位：分）</span>
                 </td>
               </tr>
               <tr>
-                <td>
-                    <span class="name">sign</span>
+                <td class="required">
+                    <span class="name">kind</span>
                 </td>
                 <td>
-                  <span class="description">符号</span>
+                  <span class="description">类型</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="required">
+                    <span class="name">happen_at</span>
+                </td>
+                <td>
+                  <span class="description">发生时间</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="required">
+                    <span class="name">tags_id</span>
+                </td>
+                <td>
+                  <span class="description">标签列表（只传ID）</span>
                 </td>
               </tr>
             </tbody>
@@ -154,39 +170,39 @@ table th, table td {
                     <span class="name">resource[id]</span>
                 </td>
                 <td>
-                  <span class="description">ID</span>
+                  <span class="description">Resource</span>
                 </td>
               </tr>
               <tr>
                 <td>
-                    <span class="name">resource[name]</span>
+                    <span class="name">resource[amount]</span>
                 </td>
                 <td>
-                  <span class="description">名称</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                    <span class="name">resource[sign]</span>
-                </td>
-                <td>
-                  <span class="description">符号</span>
+                  <span class="description">Resource amount</span>
                 </td>
               </tr>
               <tr>
                 <td>
-                    <span class="name">resource[user_id]</span>
+                    <span class="name">resource[kind]</span>
                 </td>
                 <td>
-                  <span class="description">用户ID</span>
+                  <span class="description">Resource kind</span>
                 </td>
               </tr>
               <tr>
                 <td>
-                    <span class="name">resource[delete_at]</span>
+                    <span class="name">resource[happen_at]</span>
                 </td>
                 <td>
-                  <span class="description">删除时间</span>
+                  <span class="description">Resource happen at</span>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                    <span class="name">resource[tags_id]</span>
+                </td>
+                <td>
+                  <span class="description">Resource tags</span>
                 </td>
               </tr>
             </tbody>
@@ -195,18 +211,18 @@ table th, table td {
           <h3>Request</h3>
 
             <h4>Headers</h4>
-            <pre class="request headers">Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo5MCwiZXhwIjoxNjU3Mzc0MzI0fQ.lHGsa7mibslgirmgBrU3qTCiRn5hJ9yDqFroYDeb6DU
+            <pre class="request headers">Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo4NSwiZXhwIjoxNjU3Mzc0MzI0fQ.fFUrs3EIJ_8RLoBpRGmh1dQtOW0cu1dq_IgKXJUCaRc
 Accept: application/json
 Content-Type: application/json
 Host: example.org
 Cookie: </pre>
 
           <h4>Route</h4>
-          <pre class="request route highlight">PATCH /api/v1/tags/119</pre>
+          <pre class="request route highlight">POST /api/v1/items</pre>
 
 
             <h4>Body</h4>
-            <pre class="request body">{"name":"y","sign":"y"}</pre>
+            <pre class="request body">{"amount":100,"kind":"expenses","happen_at":"2010-01-01T00:00:00+00:00","tags_id":[104,105]}</pre>
 
 
             <h3>Response</h3>
@@ -219,23 +235,28 @@ X-Permitted-Cross-Domain-Policies: none
 Referrer-Policy: strict-origin-when-cross-origin
 Content-Type: application/json; charset=utf-8
 Vary: Accept
-ETag: W/&quot;383c3116e96842c4ed470dbd2bba968e&quot;
+ETag: W/&quot;929f7ef6872ded979120a2f13cf04d13&quot;
 Cache-Control: max-age=0, private, must-revalidate
-X-Request-Id: b3959ae5-d518-46d9-a71b-22c5fe27dc82
-X-Runtime: 0.018517
-Content-Length: 155</pre>
+X-Request-Id: f9661250-e0d8-48e2-aeda-8c352f3ab15b
+X-Runtime: 0.016688
+Content-Length: 216</pre>
             <h4>Status</h4>
-            <pre class="response status">200 OK</pre>
+            <pre class="response status">201 Created</pre>
               <h4>Body</h4>
               <pre class="response body">{
   &quot;resource&quot;: {
-    &quot;name&quot;: &quot;y&quot;,
-    &quot;sign&quot;: &quot;y&quot;,
-    &quot;id&quot;: 119,
-    &quot;user_id&quot;: 90,
-    &quot;delete_at&quot;: null,
-    &quot;created_at&quot;: &quot;2022-07-09T11:45:24.279Z&quot;,
-    &quot;updated_at&quot;: &quot;2022-07-09T11:45:24.300Z&quot;
+    &quot;id&quot;: 96,
+    &quot;user_id&quot;: 85,
+    &quot;amount&quot;: 100,
+    &quot;note&quot;: null,
+    &quot;tags_id&quot;: [
+      104,
+      105
+    ],
+    &quot;happen_at&quot;: &quot;2010-01-01T00:00:00.000Z&quot;,
+    &quot;created_at&quot;: &quot;2022-07-09T11:45:24.045Z&quot;,
+    &quot;updated_at&quot;: &quot;2022-07-09T11:45:24.045Z&quot;,
+    &quot;kind&quot;: &quot;expense&quot;
   }
 }</pre>
       </div>
