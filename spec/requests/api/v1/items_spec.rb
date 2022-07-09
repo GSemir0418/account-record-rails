@@ -106,7 +106,20 @@ RSpec.describe "Items", type: :request do
       json = JSON.parse response.body
       expect(json['errors']['amount'][0]).to eq "can't be blank"
       expect(json['errors']['happen_at'][0]).to eq "can't be blank"
-      expect(json['errors']['tags_id'][0]).to eq "can't be blank"
+    end
+    it '创建时的tags_id不属于用户' do
+      user = User.create email: '1@qq.com'
+      tag1 = Tag.create name: 'x', sign: 'x', user_id: user.id
+      tag2 = Tag.create name: 'y', sign: 'y', user_id: user.id
+      post '/api/v1/items', params: {
+          tags_id: [tag1.id,tag2.id, 3],
+          amount: 99, 
+          happen_at: '2018-10-01T00:00:00+00:00'
+        }, 
+        headers: user.generate_auth_header
+      expect(response).to have_http_status(422)
+      json = JSON.parse response.body
+      expect(json['errors']['tags_id'][0]).to eq "不属于当前用户"
     end
   end
 end
