@@ -29,33 +29,36 @@ class Api::V1::ItemsController < ApplicationController
     end
 
     def summary
-        # 最后的hash be like {2018-06-18:300,2018-06-19:300,2018-06-20:300,}
         hash = Hash.new
-        # 1.拿到该用户在时间范围内全部的支出/收入的items
         items = Item
           .where(user_id: request.env['current_user_id'])
           .where(kind: params[:kind])
           .where(happen_at: params[:happened_after]..params[:happened_before])
-        # 2.遍历items，借助hash累加每天的amount
         items.each do |item|
-          # 规范格式（%F相当于%Y-%m-%d的简写）
-          key = item.happen_at.in_time_zone('Beijing').strftime('%F')
-          # 如果hash[key]没有值，则初始化为零，相当于hash[key] = hash[key] || 0
-          hash[key] ||= 0
-          # 加上当前金额
-          hash[key] += item.amount
+          # 按时间分组，hash的key为happen_at
+          if params[:group_by] == 'happen_at' 
+            key = item.happen_at.in_time_zone('Beijing').strftime('%F')
+            hash[key] ||= 0
+            hash[key] += item.amount
+          # 按tag_id分组，hash的key为tags_id，此时需要遍历内部的tag_id
+          else
+            item.tags_id.each do |tag_id|
+                hash[tag_id] ||= 0
+                hash[tag_id] += item.amount
+            end
+          end
         end
-        # 3.将hash遍历为数组（map），并排序
-        groups = hash
-          .map { |key, value| {"happen_at": key, amount: value} }
-          # <=> spaceship operator 返回-1 0 1
-          # sort!表示改变当前数组，不创建新数组
-          .sort { |a, b| a[:happen_at] <=> b[:happen_at] }
+        groups = hash.map { |key, value| {"#{params[:group_by]}": key, amount: value} }
+        # 按时间升序排序
+        if params[:group_by] == 'happen_at'
+            groups.sort! { |a, b| a[:happen_at] <=> b[:happen_at] }
+        # 按tag_id的金额降序排序，注意else if写作elsif
+        elsif params[:group_by] == 'tag_id' 
+            groups.sort! { |a, b| b[:amount] <=> a[:amount] }
+        end
         render json: {
           groups: groups,
-          # 求和利用items.sum(求和的字段)
           total: items.sum(:amount)
         }
-      end
-    
+    end
 end
