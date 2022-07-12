@@ -46,7 +46,7 @@ scp $current_dir/../config/host.Dockerfile $user@$ip:$deploy_dir/Dockerfile
 title '上传 setup 脚本'
 scp $current_dir/setup_remote.sh $user@$ip:$deploy_dir/
 title '上传 API 文档'
-scp $api_dir $user@$ip:$deploy_dir/
+scp -r $api_dir $user@$ip:$deploy_dir/
 title '上传版本号'
 ssh $user@$ip "echo $time > $deploy_dir/version"
 title '执行远程脚本'
