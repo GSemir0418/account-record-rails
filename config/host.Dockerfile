@@ -10,7 +10,8 @@ WORKDIR /mangosteen
 # 把Gemfile先拷贝过去，优先进行本地依赖安装
 ADD Gemfile /mangosteen
 ADD Gemfile.lock /mangosteen
-ADD vendor/cache /mangosteen/vendor/cache
+ADD vendor/cache.tar.gz /mangosteen/vendor/
+ADD vendor/rspec_api_documentation.tar.gz /mangosteen/vendor/
 # 安装依赖（先配置 安装时排除开发和测试环境的依赖）
 RUN bundle config set --local without 'development test'
 RUN bundle install --local
