@@ -9,7 +9,7 @@ class Api::V1::SessionsController < ApplicationController
             # 登录成功的条件有两条：
             # 1 validation存在且没有被验证过（Validation.exists? used_at: nil）
             # 2 数据库存在此用户（User.find_by_email）
-            canSignin = ValidationCodes.exists? email: params[:email], code: params[:code], used_at: nil
+            canSignin = ValidationCode.exists? email: params[:email], code: params[:code], used_at: nil
             return render status: 401 unless canSignin
             # unless 也可以写做 if not
         end
