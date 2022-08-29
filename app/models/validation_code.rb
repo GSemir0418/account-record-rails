@@ -2,6 +2,9 @@ class ValidationCode < ApplicationRecord
     validates :email, presence: true
     # 定义kind字段的枚举
     enum kind: { sign_in: 0, reset_password: 1 }
+    # email需包含@字符
+    # \A表示开头 \z表示结尾 .表示任意字符 i表示忽略大小写
+    validates :email, format: {with: /\A.+@.+\z/i}
 
     # 在创建这条记录之前，调用generate_code方法生成随机code
     before_create :generate_code

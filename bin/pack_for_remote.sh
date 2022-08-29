@@ -1,6 +1,6 @@
 # 服务器的user和ip
 user=mangosteen
-ip=121.41.82.157
+ip=114.55.42.152
 
 time=$(date +'%Y%m%d-%H%M%S')
 cache_dir=tmp/deploy_cache
