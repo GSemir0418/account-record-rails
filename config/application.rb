@@ -37,5 +37,7 @@ module Mangosteen1
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
     config.middleware.use AutoJwt
+    # i18n
+    config.i18n.default_locale = 'zh-CN'
   end
 end

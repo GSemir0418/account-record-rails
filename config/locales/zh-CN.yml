@@ -1,0 +1,12 @@
+zh-CN:
+  activerecord:
+    errors:
+      # rails自带错误提示信息的国际化
+      message:
+        invalid: 格式不正确
+      # 针对不同model的错误提示国际化
+      models:
+        validation_code:
+          attributes:
+            email:
+              invalid: 邮件地址格式不正确
